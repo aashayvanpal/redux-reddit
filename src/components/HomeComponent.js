@@ -3,30 +3,25 @@ import { Buffer } from 'buffer'
 import axios from 'axios'
 import { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
-
+import { fetchSubscribers } from '../actions'
 
 const HomeComponent = (props) => {
 
     const [selectedId, setSelectedId] = useState('')
     const [selectedName, setSelectedName] = useState('')
     const [selectedArticle, setSelectedArticle] = useState('')
-    const [subscribers, setSubscribers] = useState([])
     const [posts, setPosts] = useState([])
     const [postId, setPostId] = useState('')
     const [comments, setComments] = useState([])
     const [count, setCount] = useState(props.count)
 
     useEffect(() => {
-        console.log('redux check :', props)
+        console.log('useEffect props', props)
         getToken()
-
+        // get subscribers
+        // fetchSubscribers()
     }, [])
 
-    // useEffect(() => {
-    //     console.log('redux check only props :', props)
-    //     setSubscribers(props.subscribers)
-    //     setCount(props.count)
-    // }, [props])
 
     const getToken = async () => {
         var code = ''
@@ -67,37 +62,11 @@ const HomeComponent = (props) => {
             console.log('token', body.access_token)
 
             localStorage.setItem('token', body.access_token)
-            props.getSubscribers()
-
 
         }
         catch (e) { console.log('wrong', e) }
     }
 
-    const getSubscribers = () => {
-        try {
-            axios.get('https://oauth.reddit.com/subreddits/mine/subscriber', {
-                headers: {
-                    Authorization: `bearer ${localStorage.getItem('token')}`
-                }
-            })
-                .then((response) => response.data.data.children)
-                .then(subscribers => {
-                    const subscribersArray = subscribers.map(subscriber => {
-                        return subscriber
-                    })
-                    console.log('inside get_subscribers')
-                    console.log(subscribersArray)
-
-                    setSubscribers(subscribersArray)
-                    setSelectedId(subscribersArray[0].data.name)
-                    setSelectedName(subscribersArray[0].data.display_name_prefixed)
-                    // return { ...state, subscribers: subscribersArray }
-                })
-
-        }
-        catch (e) { console.log('wrong', e) }
-    }
 
     const getPosts = async () => {
         try {
@@ -146,8 +115,8 @@ const HomeComponent = (props) => {
 
     return (
         <div>
-            <h1>Hi this is home component</h1>
-            <button onClick={() => getSubscribers()}>get subscribers</button>
+            <h1>Hi this is home component -{count}</h1>
+            <button onClick={props.getSubscribers}>get subscribers</button>
             <button onClick={getPosts}>get Posts</button>
             <button onClick={getComment}>get comment</button>
             <Link to='/'>back</Link>
@@ -157,13 +126,13 @@ const HomeComponent = (props) => {
             <button onClick={() => props.increment(10)}>increment count</button>
             <hr />
             <hr />
-            {/* selected id - {selectedId} /
+            selected id - {selectedId} /
             selected name - {selectedName} /
-            selected Article - {selectedArticle} */}
+            selected Article - {selectedArticle}
             <hr />
 
             You have subscribed to these reddits :-
-            {subscribers.map(subscriber => <div key={subscriber.data.id}>
+            {props.subscribers.map(subscriber => <div key={subscriber.data.id}>
                 {/* ::: {subscriber.data.name}<br /> */}
                 <button onClick={() => {
                     setSelectedId(subscriber.data.name)
@@ -205,17 +174,15 @@ const HomeComponent = (props) => {
 }
 
 const mapStateToProps = (state) => {
+    console.log('MSTP home component', state)
     return {
         count: state.count,
         subscribers: state.subscribers
     }
 }
 
-const mapDispatchToProps = (dispatch) => {
-    return {
-        getSubscribers: () => dispatch({ type: 'GET_SUBSCRIBERS' }),
-        increment: (num) => dispatch({ type: 'INCREMENT', payload: num })
-    }
+const mapDispatchToProps = {
+    getSubscribers: fetchSubscribers
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeComponent)

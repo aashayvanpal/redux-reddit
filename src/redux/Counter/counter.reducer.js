@@ -1,7 +1,7 @@
 import { INCREMENT, DECREMENT } from './counter.types';
 
 const INITIAL_STATE = {
-	count: 0,
+	count: 0, name: 'aashay'
 };
 
 const reducer = (state = INITIAL_STATE, action) => {
@@ -18,7 +18,7 @@ const reducer = (state = INITIAL_STATE, action) => {
 			};
 
 		default:
-			return state;
+			return { ...state };
 	}
 };
 
