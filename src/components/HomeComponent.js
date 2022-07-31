@@ -1,9 +1,10 @@
-import { Link } from 'react-router-dom'
 import { Buffer } from 'buffer'
 import { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { fetchSubscribers, fetchPosts, fetchComments } from '../actions'
+import Header from './Header.js'
 import { Button } from 'react-bootstrap'
+import '../css/HomeComponent.css'
 
 import PostModal from './PostModal.js'
 
@@ -72,23 +73,21 @@ const HomeComponent = (props) => {
 
     return (
         <div>
+            <Header />
             <h1>Hello user , this is a reddit Redux-Saga Clone Application!</h1>
-            {/* <button onClick={props.getSubscribers}>get subscribers</button> */}
-            {/* <button onClick={props.getPosts}>get Posts</button> */}
-            {/* <button onClick={() => props.getComments(selectedName, postId, selectedArticle)}>get comment</button> */}
-            <Link to='/'><Button varient='secondary'>Logout</Button></Link>
-            <br />
             <hr />
-            selected id - {selectedId} /
-            selected name - {selectedName} /
-            selected Article - {selectedArticle}
+            selected id - {selectedId} |
+            selected name - {selectedName} |
+            selected Article - {selectedArticle} |
             <hr />
             full string - {`https://oauth.reddit.com/${selectedName}/comments/${postId}/${selectedArticle}`}
+
             <hr />
+
             You have subscribed to these reddits :-
-            <div style={{ width: '90%', display: 'block', marginLeft: 'auto', marginRight: 'auto', }}>
+            <div className='subscribers-list'>
                 {props.subscribers.map(subscriber => <div key={subscriber.data.id}>
-                    <Button variant="secondary" style={{ width: "100%", marginBottom: '10px' }}
+                    <Button variant="success" className='subscriber-button'
                         onClick={() => {
                             setSelectedId(subscriber.data.name)
                             setSelectedName(subscriber.data.display_name_prefixed)
@@ -102,14 +101,13 @@ const HomeComponent = (props) => {
 
             <hr />
 
-
-            <div style={{ width: '80%', display: 'block', marginLeft: 'auto', marginRight: 'auto', }}>
+            <div className='posts-list'>
                 Posts
                 {props.posts.filter(post => post.data.subreddit_id === selectedId).map(post => {
                     return <div key={post.data.id} onClick={() => {
                         setPostId(post.data.id)
                         setSelectedArticle(post.data.title.replaceAll(' ', '_'))
-                        console.log('DEEEEBUG', selectedName, post.data.id, post.data.title.replaceAll(' ', '_'))
+                        // console.log('DEBUG', selectedName, post.data.id, post.data.title.replaceAll(' ', '_'))
                         props.getComments(selectedName, post.data.id, post.data.title.replaceAll(' ', '_'))
                     }}>
                         <PostModal post={selectedName} postTitle={post.data.title} comments={props.comments} />
@@ -117,9 +115,6 @@ const HomeComponent = (props) => {
                     </div>
                 })}
             </div>
-
-
-            {/* <PostModal post={selectedName} comments={props.comments} /> */}
         </div >
     )
 }

@@ -3,6 +3,7 @@ const initState = { subscribers: [], posts: [], comments: [] }
 const reducer = (state = initState, action) => {
     console.log('reducer function', state)
     switch (action.type) {
+        // subscribers
         case 'GET_SUBSCRIBERS':
             console.log('getsubscribers', state, action)
             return { ...state };
@@ -11,6 +12,7 @@ const reducer = (state = initState, action) => {
             return { ...state, subscribers: action.subscribers }
 
 
+        // posts
         case 'GET_POSTS':
             console.log('getposts', state, action)
             return { ...state };
@@ -19,6 +21,7 @@ const reducer = (state = initState, action) => {
             return { ...state, posts: action.posts }
 
 
+        // comments
         case 'GET_COMMENTS':
             console.log('getcomments', state, action)
             return { ...state };

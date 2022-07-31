@@ -1,0 +1,19 @@
+.subscribers-list {
+    width: 90%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.subscriber-button {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+
+.posts-list {
+    width: 80%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}

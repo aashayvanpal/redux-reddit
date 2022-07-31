@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { Button, Modal } from 'react-bootstrap'
 
-function Example(props) {
+function PostModal(props) {
     const [show, setShow] = useState(false);
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-    console.log('modal props', props)
+    // console.log('modal props', props)
     return (
         <>
-            <Button variant="primary"
+            <Button variant="outline-primary"
                 style={{ width: "100%" }}
                 onClick={handleShow}>
                 {props.postTitle}
@@ -22,6 +22,7 @@ function Example(props) {
                         {props.post}
                     </Modal.Title>
                 </Modal.Header>
+
                 <Modal.Body>
                     Comments Section:
                     {props.comments.map(comment => <div key={comment.data.id}>
@@ -31,15 +32,15 @@ function Example(props) {
                     }
 
                 </Modal.Body>
+
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>
                         Close
                     </Button>
-
                 </Modal.Footer>
             </Modal>
         </>
     );
 }
 
-export default Example
+export default PostModal

@@ -1,0 +1,16 @@
+.header-flex {
+    display: flex;
+    background-color: #61c8f3;
+}
+
+.logo-text {
+    width: 85%;
+    display: flex;
+}
+
+#logout-link {
+    height: 100%;
+    display: block;
+    margin-bottom: auto;
+    margin-top: auto;
+}
