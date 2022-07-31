@@ -6,7 +6,6 @@ import HomeComponent from './HomeComponent'
 let App = () => (
   <div>
     <div>
-      Reddit Clone Application<br />
       <BrowserRouter>
         <Routes>
           <Route exact path="/" element={<LoginForm />} />

@@ -3,20 +3,19 @@ import { Buffer } from 'buffer'
 import { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { fetchSubscribers, fetchPosts, fetchComments } from '../actions'
+import { Button } from 'react-bootstrap'
+
+import PostModal from './PostModal.js'
 
 const HomeComponent = (props) => {
 
     const [selectedId, setSelectedId] = useState('')
     const [selectedName, setSelectedName] = useState('')
     const [selectedArticle, setSelectedArticle] = useState('')
-    const [posts, setPosts] = useState([])
     const [postId, setPostId] = useState('')
-    const [comments, setComments] = useState([])
 
     useEffect(() => {
         console.log('useEffect props', props)
-
-
         async function fetchData() {
             await getToken()
             // get subscribers
@@ -77,7 +76,7 @@ const HomeComponent = (props) => {
             {/* <button onClick={props.getSubscribers}>get subscribers</button> */}
             {/* <button onClick={props.getPosts}>get Posts</button> */}
             {/* <button onClick={() => props.getComments(selectedName, postId, selectedArticle)}>get comment</button> */}
-            <Link to='/'>Logout</Link>
+            <Link to='/'><Button varient='secondary'>Logout</Button></Link>
             <br />
             <hr />
             selected id - {selectedId} /
@@ -87,40 +86,40 @@ const HomeComponent = (props) => {
             full string - {`https://oauth.reddit.com/${selectedName}/comments/${postId}/${selectedArticle}`}
             <hr />
             You have subscribed to these reddits :-
-            {props.subscribers.map(subscriber => <div key={subscriber.data.id}>
-                <button onClick={() => {
-                    setSelectedId(subscriber.data.name)
-                    setSelectedName(subscriber.data.display_name_prefixed)
-                    props.getPosts()
-                }}>
-                    {subscriber.data.title}
-                </button>
-            </div>)
-            }
-
-
-            Posts - {props.posts.length}
-            {props.posts.filter(post => post.data.subreddit_id === selectedId).map(post => {
-                return <div key={post.data.id}><button onClick={() => {
-                    setPostId(post.data.id)
-                    setSelectedArticle(post.data.title.replaceAll(' ', '_'))
-                    console.log('DEEEEBUG', selectedName, post.data.id, post.data.title.replaceAll(' ', '_'))
-                    props.getComments(selectedName, post.data.id, post.data.title.replaceAll(' ', '_'))
-                }}>
-                    {post.data.title}
-                </button><br /></div>
-            })}
+            <div style={{ width: '90%', display: 'block', marginLeft: 'auto', marginRight: 'auto', }}>
+                {props.subscribers.map(subscriber => <div key={subscriber.data.id}>
+                    <Button variant="secondary" style={{ width: "100%", marginBottom: '10px' }}
+                        onClick={() => {
+                            setSelectedId(subscriber.data.name)
+                            setSelectedName(subscriber.data.display_name_prefixed)
+                            props.getPosts()
+                        }}>
+                        {subscriber.data.title}
+                    </Button>
+                </div>)
+                }
+            </div>
 
             <hr />
-            Comments
-            {props.comments.map(comment => <div key={comment.id}>
-                {/* {comment.data.id}--? 
-                {comment.data.subreddit_id} */}
-                {comment.data.body}
-                <hr />
-            </div>)
-            }
 
+
+            <div style={{ width: '80%', display: 'block', marginLeft: 'auto', marginRight: 'auto', }}>
+                Posts
+                {props.posts.filter(post => post.data.subreddit_id === selectedId).map(post => {
+                    return <div key={post.data.id} onClick={() => {
+                        setPostId(post.data.id)
+                        setSelectedArticle(post.data.title.replaceAll(' ', '_'))
+                        console.log('DEEEEBUG', selectedName, post.data.id, post.data.title.replaceAll(' ', '_'))
+                        props.getComments(selectedName, post.data.id, post.data.title.replaceAll(' ', '_'))
+                    }}>
+                        <PostModal post={selectedName} postTitle={post.data.title} comments={props.comments} />
+                        <hr />
+                    </div>
+                })}
+            </div>
+
+
+            {/* <PostModal post={selectedName} comments={props.comments} /> */}
         </div >
     )
 }
