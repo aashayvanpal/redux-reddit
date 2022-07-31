@@ -1,23 +1,12 @@
 import React from 'react';
-import Button from '../containers/Button';
-import NewsItem from '../containers/NewsItem'
-import Loading from '../containers/Loading'
-import {
-  BrowserRouter,
-  Routes,
-  Route
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginForm from './LoginPage'
 import HomeComponent from './HomeComponent'
 
 let App = () => (
   <div>
-    <Button />
-    <Loading />
-    <NewsItem />
-
     <div>
-      for reddit clone application<br />
+      Reddit Clone Application<br />
       <BrowserRouter>
         <Routes>
           <Route exact path="/" element={<LoginForm />} />

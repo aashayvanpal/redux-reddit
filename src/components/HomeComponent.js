@@ -1,9 +1,8 @@
 import { Link } from 'react-router-dom'
 import { Buffer } from 'buffer'
-import axios from 'axios'
 import { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
-import { fetchSubscribers } from '../actions'
+import { fetchSubscribers, fetchPosts, fetchComments } from '../actions'
 
 const HomeComponent = (props) => {
 
@@ -13,13 +12,17 @@ const HomeComponent = (props) => {
     const [posts, setPosts] = useState([])
     const [postId, setPostId] = useState('')
     const [comments, setComments] = useState([])
-    const [count, setCount] = useState(props.count)
 
     useEffect(() => {
         console.log('useEffect props', props)
-        getToken()
-        // get subscribers
-        // fetchSubscribers()
+
+
+        async function fetchData() {
+            await getToken()
+            // get subscribers
+            await props.getSubscribers()
+        }
+        fetchData();
     }, [])
 
 
@@ -68,104 +71,53 @@ const HomeComponent = (props) => {
     }
 
 
-    const getPosts = async () => {
-        try {
-            axios.get('https://oauth.reddit.com/best?limit=100', {
-                headers: {
-                    Authorization: `bearer ${localStorage.getItem('token')}`,
-                },
-            })
-                .then((response) => {
-                    console.log('best response:', response)
-                    // console.log('data:', response.data.data.children)
-                    const posts = response.data.data.children.map(post => {
-                        return post
-                    })
-                    console.log(posts)
-                    setPosts(posts)
-                })
-
-        }
-        catch (e) { console.log('wrong', e) }
-
-    }
-
-    const getComment = async () => {
-        try {
-            axios.get(`https://oauth.reddit.com/${selectedName}/comments/${postId}/${selectedArticle}?dept=1`, {
-                headers: {
-                    Authorization: `bearer ${localStorage.getItem('token')}`,
-                },
-            })
-                .then((response) => {
-                    console.log('comment response:', response)
-                    // console.log('data:', response.data.data.children)
-                    const comments = response.data[1].data.children.map(comment => {
-                        return comment
-                    })
-                    console.log(comments)
-                    setComments(comments)
-
-                })
-
-        }
-        catch (e) { console.log('wrong', e) }
-    }
-
-
     return (
         <div>
-            <h1>Hi this is home component -{count}</h1>
-            <button onClick={props.getSubscribers}>get subscribers</button>
-            <button onClick={getPosts}>get Posts</button>
-            <button onClick={getComment}>get comment</button>
-            <Link to='/'>back</Link>
+            <h1>Hello user , this is a reddit Redux-Saga Clone Application!</h1>
+            {/* <button onClick={props.getSubscribers}>get subscribers</button> */}
+            {/* <button onClick={props.getPosts}>get Posts</button> */}
+            {/* <button onClick={() => props.getComments(selectedName, postId, selectedArticle)}>get comment</button> */}
+            <Link to='/'>Logout</Link>
             <br />
-            <br />
-            <hr />
-            <button onClick={() => props.increment(10)}>increment count</button>
-            <hr />
             <hr />
             selected id - {selectedId} /
             selected name - {selectedName} /
             selected Article - {selectedArticle}
             <hr />
-
+            full string - {`https://oauth.reddit.com/${selectedName}/comments/${postId}/${selectedArticle}`}
+            <hr />
             You have subscribed to these reddits :-
             {props.subscribers.map(subscriber => <div key={subscriber.data.id}>
-                {/* ::: {subscriber.data.name}<br /> */}
                 <button onClick={() => {
                     setSelectedId(subscriber.data.name)
                     setSelectedName(subscriber.data.display_name_prefixed)
+                    props.getPosts()
                 }}>
                     {subscriber.data.title}
                 </button>
             </div>)
             }
 
-            full string - {`https://oauth.reddit.com/${selectedName}/comments/${postId}/${selectedArticle}`}
-            <hr />
-            Posts - {posts.length}
-            {posts.filter(post => post.data.subreddit_id === selectedId).map(post => {
-                // {/* {post.data.id}--? / */}
-                // {/* {post.data.subreddit_name_prefixed}/ */}
-                // {/* {post.data.subreddit_id} */}
-                return <div><button onClick={() => {
+
+            Posts - {props.posts.length}
+            {props.posts.filter(post => post.data.subreddit_id === selectedId).map(post => {
+                return <div key={post.data.id}><button onClick={() => {
                     setPostId(post.data.id)
                     setSelectedArticle(post.data.title.replaceAll(' ', '_'))
+                    console.log('DEEEEBUG', selectedName, post.data.id, post.data.title.replaceAll(' ', '_'))
+                    props.getComments(selectedName, post.data.id, post.data.title.replaceAll(' ', '_'))
                 }}>
-
                     {post.data.title}
                 </button><br /></div>
             })}
 
-
-
             <hr />
-            Comments - {customElements.length}
-            {comments.map(comment => <div key={comment.id}>
-                {comment.data.id}--? {comment.data.body} - {comment.data.subreddit_id}
-                <br />
+            Comments
+            {props.comments.map(comment => <div key={comment.id}>
+                {/* {comment.data.id}--? 
+                {comment.data.subreddit_id} */}
+                {comment.data.body}
+                <hr />
             </div>)
             }
 
@@ -176,13 +128,16 @@ const HomeComponent = (props) => {
 const mapStateToProps = (state) => {
     console.log('MSTP home component', state)
     return {
-        count: state.count,
-        subscribers: state.subscribers
+        subscribers: state.subscribers,
+        posts: state.posts,
+        comments: state.comments
     }
 }
 
 const mapDispatchToProps = {
-    getSubscribers: fetchSubscribers
+    getSubscribers: fetchSubscribers,
+    getPosts: fetchPosts,
+    getComments: fetchComments
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeComponent)
